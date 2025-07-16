@@ -8,6 +8,12 @@ def get_character_frequency(string:str):
         counter[char] = counter.get(char, 0) + 1
     return counter
 
+def get_stdin_character_frequency():
+    try:
+        return sorted([(k, v) for k,v in get_character_frequency(stdin.read()).items()], key=lambda x: x[1], reverse=True)
+    except Exception:
+        return []
+
 def get_file_character_frequency(path:str):
     counter = {}
     with open(path, "r") as file:
@@ -15,7 +21,7 @@ def get_file_character_frequency(path:str):
             line_counter = get_character_frequency(line)
             for k in line_counter.keys():
                 counter[k] = counter.get(k, 0) + line_counter[k]
-    return counter
+    return sorted([(k, v) for k,v in counter.items()], key=lambda x: x[1], reverse=True)
 
 def get_file_details(path:str):
     res = {
@@ -35,13 +41,13 @@ def main():
     args = parser.parse_args()
 
     if not args.FILE:
-        char_freq = get_character_frequency(stdin.read())
+        char_freq = get_stdin_character_frequency()
         print(char_freq)
     else:
         char_freq = None
         for f in args.FILE:
             if f == "-":
-                char_freq = get_character_frequency(stdin.read())
+                char_freq = get_stdin_character_frequency()
             else:
                 file_details = get_file_details(f)
                 if not file_details["exists"]:

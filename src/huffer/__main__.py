@@ -1,6 +1,8 @@
 from argparse import ArgumentParser
 from sys import stdin
 from os.path import exists, isfile
+from os import access as os_access, R_OK, W_OK
+
 
 class HuffNode:
     def __init__(self, left, right):
@@ -35,11 +37,15 @@ def get_file_character_frequency(path:str):
 def get_file_details(path:str):
     res = {
         "exists": exists(path),
-        "is_file": False
+        "is_file": False,
+        "can_read": False,
+        "can_write": False
     }
 
     if res["exists"]:
         res["is_file"] = isfile(path)
+        res["can_read"] = os_access(path, R_OK)
+        res["can_write"] = os_access(path, W_OK)
     
     return res
 
@@ -91,6 +97,9 @@ def main():
                     continue
                 if not file_details["is_file"]:
                     print(f"{parser.prog}: {f}: Is a directory")
+                    continue
+                if not file_details["can_read"]:
+                    print(f"{parser.prog}: {f}: Permission denied")
                     continue
 
                 char_freq = get_file_character_frequency(f)

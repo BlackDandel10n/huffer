@@ -74,6 +74,20 @@ def get_huff_tree(char_freq_list):
 
     return char_freq_list.pop()[0]
 
+def get_huff_encoding(Node, encoding_dict = None, n = 1):
+    if encoding_dict is None:
+        encoding_dict = {}
+    
+    if Node is None:
+        return encoding_dict
+    
+    if isinstance(Node, HuffNode):
+        get_huff_encoding(Node.left, encoding_dict, (n << 1) | 1)
+        get_huff_encoding(Node.right, encoding_dict, n << 1)
+        return encoding_dict
+
+    encoding_dict[Node] = n
+
 
 def main():
     parser = ArgumentParser("huffer", description="A huffman encoder/decoder written in python")
@@ -84,7 +98,9 @@ def main():
     if not args.FILE:
         char_freq = get_stdin_character_frequency()
         huff_tree = get_huff_tree(char_freq)
-        print(huff_tree)
+        huff_encoings = get_huff_encoding(huff_tree)
+        for key, value in huff_encoings.items():
+            print(f"{key}: {bin(value)[2:]}")
     else:
         char_freq = None
         for f in args.FILE:
@@ -105,7 +121,9 @@ def main():
                 char_freq = get_file_character_frequency(f)
             
             huff_tree = get_huff_tree(char_freq)
-            print(huff_tree)
+            huff_encoings = get_huff_encoding(huff_tree)
+            for key, value in huff_encoings.items():
+                print(f"{key}: {bin(value)[2:]}")
             
 
 if __name__ == "__main__":
